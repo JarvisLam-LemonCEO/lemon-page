@@ -1,0 +1,167 @@
+
+### Phase 1 – Finish the core (highest priority)
+
+* ⭐ **Service Details page**
+
+  * Clicking **View Details** opens a detailed page or modal.
+  * Larger photo gallery.
+  * Complete contact information.
+  * Business information.
+  * Opening hours.
+  * Website link.
+  * Share button.
+
+* ⭐ **Business logo upload**
+
+  * Separate from the listing photo.
+  * Display on every listing.
+
+* ⭐ **Multiple listing photos**
+
+  * Upload 5–10 images.
+  * Carousel/gallery.
+
+* ⭐ **Service categories**
+
+  * Replace free-text category with a dropdown.
+  * Examples:
+
+    * Restaurants
+    * Hotels
+    * Beauty
+    * Automotive
+    * Home Services
+    * Education
+    * Healthcare
+    * Shopping
+    * Entertainment
+
+---
+
+### Phase 2 – Yellow Pages features
+
+* ⭐ Favorite listings
+* ⭐ Save for later
+* ⭐ Recently viewed
+* ⭐ Search history
+* ⭐ Popular services
+* ⭐ New listings
+* ⭐ Featured businesses
+
+---
+
+### Phase 3 – Business dashboard
+
+Instead of just showing listings, make it look like a dashboard:
+
+```text
++-------------------------------------------+
+| Business Dashboard                        |
++-------------------------------------------+
+
+📊 Total Listings      8
+👁 Views               210
+⭐ Reviews             15
+❤️ Favorites           31
+
+--------------------------------------------
+
+My Listings
+
+┌────────────────────────────┐
+│ Computer Repair            │
+│ Active                     │
+│ Edit  Delete               │
+└────────────────────────────┘
+```
+
+---
+
+### Phase 4 – Reviews ⭐⭐⭐⭐⭐
+
+This is one of the biggest features for a directory app.
+
+Users can:
+
+* Leave reviews
+* Rate 1–5 stars
+* Edit their own reviews
+* Delete their own reviews
+
+Businesses can:
+
+* View ratings
+* Respond to reviews
+
+---
+
+### Phase 5 – Maps
+
+This is where Lemon Page becomes much more useful.
+
+Every listing shows:
+
+📍 Google Maps
+
+```
+Business
+123 Main Street
+San Jose, CA
+
+[ Map ]
+```
+
+---
+
+### Phase 6 – Admin panel
+
+Create a third role:
+
+```
+Admin
+```
+
+Admin can:
+
+* Delete any listing
+* Delete any account
+* View statistics
+* Manage categories
+* Approve reported businesses
+
+---
+
+### Phase 7 – AI Search (very impressive)
+
+Instead of:
+
+```
+Computer
+```
+
+Users can type:
+
+> "I need someone to repair my gaming PC."
+
+or
+
+> "Looking for cheap sushi near San Jose."
+
+Your app searches intelligently.
+
+---
+
+## My recommendation
+
+The next feature I'd build is **Reviews and Ratings**.
+
+Why?
+
+* It's expected in a Yellow Pages app.
+* It ties together both user roles:
+
+  * Normal users contribute reviews.
+  * Business users receive feedback.
+* It gives your service cards a much richer look with star ratings and review counts.
+
+Adding reviews will make Lemon Page feel much closer to a real directory platform like Yelp or Google Business Profiles.
