@@ -140,3 +140,21 @@ lemon-page
 │   └── uploads
 │
 └── README.md
+
+## 🚀 Installation
+Clone the repository
+```bash
+git clone https://github.com/yourusername/lemon-page.git
+```
+Frontend
+```bash
+cd client
+npm install
+npm run dev
+```
+Backend
+```bash
+cd server
+npm install
+npm run dev
+```
