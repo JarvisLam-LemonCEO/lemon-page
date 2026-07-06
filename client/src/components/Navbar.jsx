@@ -33,6 +33,12 @@ const handleLogout = () => {
   </button>
 )}
 
+{user?.is_admin === 1 && (
+  <button className="profile-btn" onClick={() => navigate("/admin")}>
+    Admin
+  </button>
+)}
+
         <button className="profile-btn" onClick={() => navigate("/profile")}>
   Profile
 </button>

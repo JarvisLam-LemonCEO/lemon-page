@@ -1,21 +1,56 @@
 const db = require("../db");
 
 exports.getAllServices = (req, res) => {
-  const sql = `
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 9;
+  const offset = (page - 1) * limit;
+
+  const sort = req.query.sort || "newest";
+
+  let orderBy = "services.created_at DESC";
+
+  if (sort === "popular") {
+    orderBy = "services.view_count DESC";
+  }
+
+  if (sort === "name") {
+    orderBy = "services.service_name ASC";
+  }
+
+  const countSql = `
+    SELECT COUNT(*) AS total
+    FROM services
+  `;
+
+  const dataSql = `
     SELECT services.*, users.name AS business_name
     FROM services
     JOIN users ON services.user_id = users.id
-    ORDER BY services.created_at DESC
+    ORDER BY ${orderBy}
+    LIMIT ? OFFSET ?
   `;
 
-  db.all(sql, [], (err, services) => {
+  db.get(countSql, [], (err, countResult) => {
     if (err) {
-      return res.status(500).json({ message: "Failed to get services" });
+      return res.status(500).json({ message: "Failed to count services" });
     }
 
-    res.json(services);
+    db.all(dataSql, [limit, offset], (err, services) => {
+      if (err) {
+        return res.status(500).json({ message: "Failed to get services" });
+      }
+
+      res.json({
+        services,
+        total: countResult.total,
+        page,
+        limit,
+        totalPages: Math.ceil(countResult.total / limit),
+      });
+    });
   });
 };
+
 
 exports.getMyServices = (req, res) => {
   const sql = `

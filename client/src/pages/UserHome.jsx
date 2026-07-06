@@ -12,7 +12,6 @@ import {
   getFeaturedBusinesses,
 } from "../api/activityApi";
 
-
 import {
   getFavorites,
   addFavorite,
@@ -27,9 +26,14 @@ function UserHome() {
   const [searchHistory, setSearchHistory] = useState([]);
   const [selectedService, setSelectedService] = useState(null);
   const [favorites, setFavorites] = useState([]);
+
   const [popularServices, setPopularServices] = useState([]);
   const [newListings, setNewListings] = useState([]);
   const [featuredBusinesses, setFeaturedBusinesses] = useState([]);
+
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [sort, setSort] = useState("newest");
 
   const [filters, setFilters] = useState({
     category: "",
@@ -40,31 +44,38 @@ function UserHome() {
   });
 
   useEffect(() => {
-    const loadData = async () => {
-      try {
-        const serviceData = await getAllServices();
-        const viewedData = await getRecentlyViewed();
-        const historyData = await getSearchHistory();
-        const favoriteData = await getFavorites();
-        const popularData = await getPopularServices();
-        const newListingsData = await getNewListings();
-        const featuredData = await getFeaturedBusinesses();
-        setFeaturedBusinesses(featuredData);
+  const loadData = async () => {
+  try {
+    const serviceData = await getAllServices(page, 9, sort);
+    const viewedData = await getRecentlyViewed();
+    const historyData = await getSearchHistory();
+    const favoriteData = await getFavorites();
+    const popularData = await getPopularServices();
+    const newListingsData = await getNewListings();
+    const featuredData = await getFeaturedBusinesses();
 
-        setPopularServices(popularData);
-        setNewListings(newListingsData);
+    // Handle both old and new API responses
+    if (Array.isArray(serviceData)) {
+      setServices(serviceData);
+      setTotalPages(1);
+    } else {
+      setServices(serviceData.services || []);
+      setTotalPages(serviceData.totalPages || 1);
+    }
 
-        setServices(serviceData);
-        setRecentlyViewed(viewedData);
-        setSearchHistory(historyData);
-        setFavorites(favoriteData);
-      } catch (error) {
-        console.log("Failed to load user home data", error);
-      }
-    };
+    setRecentlyViewed(viewedData || []);
+    setSearchHistory(historyData || []);
+    setFavorites(favoriteData || []);
+    setPopularServices(popularData || []);
+    setNewListings(newListingsData || []);
+    setFeaturedBusinesses(featuredData || []);
+  } catch (error) {
+    console.error("Failed to load user home data:", error);
+  }
+};
 
     loadData();
-  }, []);
+  }, [page, sort]);
 
   const isFavorite = (serviceId) => {
     return favorites.some((item) => item.id === serviceId);
@@ -201,6 +212,12 @@ function UserHome() {
           />
         </section>
 
+        <div className="search-history-actions">
+          <button className="save-search-btn" onClick={handleSaveSearch}>
+            Save Search
+          </button>
+        </div>
+
         {recentlyViewed.length > 0 && (
           <section className="mini-section">
             <h2>Recently Viewed</h2>
@@ -256,68 +273,83 @@ function UserHome() {
         )}
 
         {popularServices.length > 0 && (
-  <section className="mini-section">
-    <h2>🔥 Popular Services</h2>
+          <section className="mini-section">
+            <h2>🔥 Popular Services</h2>
 
-    <div className="mini-card-row">
-      {popularServices.slice(0, 4).map((service) => (
-        <button
-          key={service.id}
-          className="mini-service-card"
-          onClick={() => handleViewDetails(service)}
-        >
-          <strong>{service.service_name}</strong>
-          <span>{service.category}</span>
-        </button>
-      ))}
-    </div>
-  </section>
-)}
+            <div className="mini-card-row">
+              {popularServices.slice(0, 4).map((service) => (
+                <button
+                  key={service.id}
+                  className="mini-service-card"
+                  onClick={() => handleViewDetails(service)}
+                >
+                  <strong>{service.service_name}</strong>
+                  <span>{service.category}</span>
+                </button>
+              ))}
+            </div>
+          </section>
+        )}
 
-{newListings.length > 0 && (
-  <section className="mini-section">
-    <h2>⭐ New Listings</h2>
+        {featuredBusinesses.length > 0 && (
+          <section className="mini-section">
+            <h2>⭐ Featured Businesses</h2>
 
-    <div className="mini-card-row">
-      {newListings.slice(0, 4).map((service) => (
-        <button
-          key={service.id}
-          className="mini-service-card"
-          onClick={() => handleViewDetails(service)}
-        >
-          <strong>{service.service_name}</strong>
-          <span>{service.category}</span>
-        </button>
-      ))}
-    </div>
-  </section>
-)}
+            <div className="mini-card-row">
+              {featuredBusinesses.slice(0, 4).map((service) => (
+                <button
+                  key={service.id}
+                  className="mini-service-card featured-mini-card"
+                  onClick={() => handleViewDetails(service)}
+                >
+                  <strong>{service.service_name}</strong>
+                  <span>{service.category}</span>
+                </button>
+              ))}
+            </div>
+          </section>
+        )}
 
-{featuredBusinesses.length > 0 && (
-  <section className="mini-section">
-    <h2>⭐ Featured Businesses</h2>
+        {newListings.length > 0 && (
+          <section className="mini-section">
+            <h2>🆕 New Listings</h2>
 
-    <div className="mini-card-row">
-      {featuredBusinesses.slice(0, 4).map((service) => (
-        <button
-          key={service.id}
-          className="mini-service-card featured-mini-card"
-          onClick={() => handleViewDetails(service)}
-        >
-          <strong>{service.service_name}</strong>
-          <span>{service.category}</span>
-        </button>
-      ))}
-    </div>
-  </section>
-)}
+            <div className="mini-card-row">
+              {newListings.slice(0, 4).map((service) => (
+                <button
+                  key={service.id}
+                  className="mini-service-card"
+                  onClick={() => handleViewDetails(service)}
+                >
+                  <strong>{service.service_name}</strong>
+                  <span>{service.category}</span>
+                </button>
+              ))}
+            </div>
+          </section>
+        )}
 
-<section className="browse-header">
-  <h2>Browse All Services</h2>
-  <p>Explore every available Lemon Page listing.</p>
-</section>
+        <section className="browse-header">
+          <h2>Browse All Services</h2>
+          <p>Explore every available Lemon Page listing.</p>
+        </section>
 
-{/* ===== Main Service Grid ===== */}
+        <div className="sort-row">
+          <label>Sort by:</label>
+
+          <select
+            value={sort}
+            onChange={(e) => {
+              setSort(e.target.value);
+              setPage(1);
+            }}
+          >
+            <option value="newest">Newest</option>
+            <option value="popular">Most Popular</option>
+            <option value="name">Name A-Z</option>
+          </select>
+        </div>
+
         <section className="intro-service-grid">
           {filteredServices.length === 0 && (
             <div className="empty-state">
@@ -382,6 +414,26 @@ function UserHome() {
             </article>
           ))}
         </section>
+
+        <div className="pagination-row">
+          <button
+            disabled={page === 1}
+            onClick={() => setPage(page - 1)}
+          >
+            Previous
+          </button>
+
+          <span>
+            Page {page} of {totalPages}
+          </span>
+
+          <button
+            disabled={page === totalPages}
+            onClick={() => setPage(page + 1)}
+          >
+            Next
+          </button>
+        </div>
 
         {selectedService && (
           <div className="modal-overlay" onClick={() => setSelectedService(null)}>

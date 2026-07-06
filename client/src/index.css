@@ -1537,3 +1537,80 @@ label {
   background: #ffd43b;
   color: #202124;
 }
+
+/* admin dashboard */
+.admin-page {
+  min-height: calc(100vh - 75px);
+  padding: 38px 6%;
+  background: linear-gradient(135deg, #fffbea, #fff3bf);
+}
+
+.admin-section {
+  max-width: 1200px;
+  margin: 28px auto;
+  background: white;
+  padding: 28px;
+  border-radius: 26px;
+  box-shadow: 0 18px 45px rgba(122, 91, 0, 0.12);
+}
+
+.admin-section h2 {
+  color: #2f7d32;
+}
+
+.admin-table-wrap {
+  overflow-x: auto;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.admin-table th,
+.admin-table td {
+  padding: 14px;
+  border-bottom: 1px solid #eef2e8;
+  text-align: left;
+}
+
+.admin-table th {
+  color: #2f7d32;
+}
+
+.admin-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.sort-row,
+.pagination-row {
+  max-width: 1450px;
+  margin: 20px auto;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 14px;
+}
+
+.sort-row select {
+  width: 180px;
+}
+
+.pagination-row {
+  justify-content: center;
+}
+
+.pagination-row button {
+  background: #ffd43b;
+  color: #202124;
+  padding: 10px 18px;
+  border-radius: 12px;
+  font-weight: 800;
+}
+
+.pagination-row button:disabled {
+  background: #e5e7eb;
+  color: #9ca3af;
+  cursor: not-allowed;
+}

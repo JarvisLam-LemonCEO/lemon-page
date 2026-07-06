@@ -15,7 +15,12 @@ function Intro() {
     const loadServices = async () => {
       try {
         const data = await getAllServices();
-        setServices(data);
+
+if (Array.isArray(data)) {
+  setServices(data);
+} else {
+  setServices(data.services || []);
+}
       } catch (error) {
         console.log("Failed to load services", error);
       }

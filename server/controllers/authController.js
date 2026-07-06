@@ -49,6 +49,7 @@ res.status(201).json({
     name,
     email,
     role,
+    is_admin: 0,
   },
 });
     });
@@ -98,6 +99,7 @@ exports.login = (req, res) => {
         name: user.name,
         email: user.email,
         role: user.role,
+        is_admin: user.is_admin,
       },
     });
   });

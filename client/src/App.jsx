@@ -9,6 +9,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import PublicRoute from "./components/PublicRoute";
 import NotFound from "./pages/NotFound";
 import Favorites from "./pages/Favorites";
+import AdminDashboard from "./pages/AdminDashboard";
 
 function App() {
   return (
@@ -66,6 +67,15 @@ function App() {
   element={
     <ProtectedRoute allowedRole="normal">
       <Favorites />
+    </ProtectedRoute>
+  }
+/>
+
+<Route
+  path="/admin"
+  element={
+    <ProtectedRoute>
+      <AdminDashboard />
     </ProtectedRoute>
   }
 />

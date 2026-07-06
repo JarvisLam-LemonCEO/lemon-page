@@ -9,6 +9,7 @@ const userRoutes = require("./routes/userRoutes");
 const activityRoutes = require("./routes/activityRoutes");
 const favoriteRoutes = require("./routes/favoriteRoutes");
 const statsRoutes = require("./routes/statsRoutes");
+const adminRoutes = require("./routes/adminRoutes");
 
 const app = express();
 
@@ -25,6 +26,8 @@ app.use("/api/users", userRoutes);
 app.use("/api/activity", activityRoutes);
 app.use("/api/favorites", favoriteRoutes);
 app.use("/api/stats", statsRoutes);
+app.use("/api/admin", adminRoutes);
+
 const PORT = process.env.PORT || 5050;
 
 app.listen(PORT, () => {

@@ -4,8 +4,11 @@ const API_URL = "http://localhost:5050/api/services";
 
 const getToken = () => localStorage.getItem("token");
 
-export const getAllServices = async () => {
-  const response = await axios.get(API_URL);
+export const getAllServices = async (page = 1, limit = 9, sort = "newest") => {
+  const response = await axios.get(API_URL, {
+    params: { page, limit, sort },
+  });
+
   return response.data;
 };
 

@@ -20,53 +20,42 @@ const addColumn = (table, column, definition) => {
 
 db.serialize(() => {
   addColumn("users", "created_at", "DATETIME DEFAULT CURRENT_TIMESTAMP");
+  addColumn("users", "is_admin", "INTEGER DEFAULT 0");
 
   addColumn("services", "image_url", "TEXT");
   addColumn("services", "is_featured", "INTEGER DEFAULT 0");
   addColumn("services", "view_count", "INTEGER DEFAULT 0");
 
   db.run(`
-    CREATE TABLE IF NOT EXISTS favorites (
+    CREATE TABLE IF NOT EXISTS notifications (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       user_id INTEGER NOT NULL,
-      service_id INTEGER NOT NULL,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      UNIQUE(user_id, service_id)
+      service_id INTEGER,
+      type TEXT NOT NULL,
+      message TEXT NOT NULL,
+      is_read INTEGER DEFAULT 0,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )
   `);
 
   db.run(`
-    CREATE TABLE IF NOT EXISTS saved_services (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      user_id INTEGER NOT NULL,
-      service_id INTEGER NOT NULL,
-      note TEXT,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      UNIQUE(user_id, service_id)
-    )
+    CREATE INDEX IF NOT EXISTS idx_services_created_at
+    ON services(created_at)
   `);
 
   db.run(`
-    CREATE TABLE IF NOT EXISTS recently_viewed (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      user_id INTEGER NOT NULL,
-      service_id INTEGER NOT NULL,
-      viewed_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      UNIQUE(user_id, service_id)
-    )
+    CREATE INDEX IF NOT EXISTS idx_services_view_count
+    ON services(view_count)
   `);
 
   db.run(`
-    CREATE TABLE IF NOT EXISTS search_history (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      user_id INTEGER NOT NULL,
-      search_text TEXT,
-      category TEXT,
-      zip_code TEXT,
-      state TEXT,
-      country TEXT,
-      searched_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    )
+    CREATE INDEX IF NOT EXISTS idx_services_category
+    ON services(category)
+  `);
+
+  db.run(`
+    CREATE INDEX IF NOT EXISTS idx_notifications_user_id
+    ON notifications(user_id)
   `);
 
   console.log("Migration complete");
