@@ -21,6 +21,9 @@ Business users can create, edit, and manage their own service listings.
 
 ---
 
+## Application Flowchart
+![Application Flow](flowchart.png)
+
 ## ✨ Features
 
 ### 🌐 Landing Page
