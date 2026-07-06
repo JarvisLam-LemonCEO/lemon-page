@@ -1,4 +1,5 @@
 const db = require("../db");
+const createNotification = require("../utils/createNotification");
 
 exports.getFavorites = (req, res) => {
   const sql = `
@@ -34,6 +35,23 @@ exports.addFavorite = (req, res) => {
 
     res.json({ message: "Service saved successfully" });
   });
+
+  db.get(
+  `SELECT user_id, service_name FROM services WHERE id = ?`,
+  [serviceId],
+  (err, service) => {
+    if (!err && service && service.user_id !== req.user.id) {
+      createNotification({
+        userId: service.user_id,
+        serviceId,
+        type: "favorite",
+        message: `Someone saved your listing "${service.service_name}".`,
+      });
+    }
+
+    res.json({ message: "Service saved successfully" });
+  }
+);
 };
 
 exports.removeFavorite = (req, res) => {

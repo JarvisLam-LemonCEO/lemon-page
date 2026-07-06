@@ -1,4 +1,5 @@
 const db = require("../db");
+const createNotification = require("../utils/createNotification");
 
 exports.getNewListings = (req, res) => {
   const sql = `
@@ -70,6 +71,23 @@ exports.addRecentlyViewed = (req, res) => {
       res.json({ message: "Recently viewed saved" });
     }
   );
+
+  db.get(
+  `SELECT user_id, service_name FROM services WHERE id = ?`,
+  [serviceId],
+  (err, service) => {
+    if (!err && service && service.user_id !== req.user.id) {
+      createNotification({
+        userId: service.user_id,
+        serviceId,
+        type: "view",
+        message: `Your listing "${service.service_name}" was viewed.`,
+      });
+    }
+
+    res.json({ message: "Recently viewed saved" });
+  }
+);
 };
 
 exports.getRecentlyViewed = (req, res) => {

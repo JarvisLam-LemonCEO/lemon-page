@@ -1,4 +1,5 @@
 const db = require("../db");
+const createNotification = require("../utils/createNotification");
 
 exports.getAllUsers = (req, res) => {
   db.all(
@@ -82,4 +83,23 @@ exports.toggleListingFeatured = (req, res) => {
       res.json({ message: "Listing updated successfully" });
     }
   );
+
+  db.get(
+  `SELECT user_id, service_name FROM services WHERE id = ?`,
+  [id],
+  (err, service) => {
+    if (!err && service) {
+      createNotification({
+        userId: service.user_id,
+        serviceId: id,
+        type: "featured",
+        message: is_featured
+          ? `Your listing "${service.service_name}" was featured.`
+          : `Your listing "${service.service_name}" was unfeatured.`,
+      });
+    }
+
+    res.json({ message: "Listing updated successfully" });
+  }
+);
 };
