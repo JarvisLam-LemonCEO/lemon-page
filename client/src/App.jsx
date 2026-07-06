@@ -10,6 +10,7 @@ import PublicRoute from "./components/PublicRoute";
 import NotFound from "./pages/NotFound";
 import Favorites from "./pages/Favorites";
 import AdminDashboard from "./pages/AdminDashboard";
+import Notifications from "./pages/Notifications";
 
 function App() {
   return (
@@ -70,7 +71,14 @@ function App() {
     </ProtectedRoute>
   }
 />
-
+<Route
+  path="/notifications"
+  element={
+    <ProtectedRoute allowedRole="business">
+      <Notifications />
+    </ProtectedRoute>
+  }
+/>
 <Route
   path="/admin"
   element={
