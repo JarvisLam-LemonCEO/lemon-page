@@ -33,25 +33,23 @@ exports.addFavorite = (req, res) => {
       return res.status(500).json({ message: "Failed to save service" });
     }
 
-    res.json({ message: "Service saved successfully" });
+    db.get(
+      `SELECT user_id, service_name FROM services WHERE id = ?`,
+      [serviceId],
+      (err, service) => {
+        if (!err && service && service.user_id !== req.user.id) {
+          createNotification({
+            userId: service.user_id,
+            serviceId,
+            type: "favorite",
+            message: `Someone saved your listing "${service.service_name}".`,
+          });
+        }
+
+        return res.json({ message: "Service saved successfully" });
+      }
+    );
   });
-
-  db.get(
-  `SELECT user_id, service_name FROM services WHERE id = ?`,
-  [serviceId],
-  (err, service) => {
-    if (!err && service && service.user_id !== req.user.id) {
-      createNotification({
-        userId: service.user_id,
-        serviceId,
-        type: "favorite",
-        message: `Someone saved your listing "${service.service_name}".`,
-      });
-    }
-
-    res.json({ message: "Service saved successfully" });
-  }
-);
 };
 
 exports.removeFavorite = (req, res) => {
