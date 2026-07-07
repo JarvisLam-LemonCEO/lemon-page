@@ -1,8 +1,11 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { getAllServices } from "../api/serviceApi";
+import { getReviewsByService } from "../api/reviewApi";
 
 function Intro() {
+  const [selectedService, setSelectedService] = useState(null);
+  const [reviews, setReviews] = useState([]);
   const [services, setServices] = useState([]);
   const [filters, setFilters] = useState({
     category: "",
@@ -44,6 +47,17 @@ if (Array.isArray(data)) {
         service.country?.toLowerCase().includes(filters.country.toLowerCase()))
     );
   });
+
+  const handleViewDetails = async (service) => {
+  setSelectedService(service);
+
+  try {
+    const reviewData = await getReviewsByService(service.id);
+    setReviews(reviewData);
+  } catch (err) {
+    console.log(err);
+  }
+};
 
   return (
     <div className="intro-page compact-intro">
@@ -113,54 +127,175 @@ if (Array.isArray(data)) {
       </section>
 
       <section className="intro-service-grid">
-        {filteredServices.length === 0 && (
-          <div className="empty-state">
-            <h3>No services found</h3>
-            <p>Try changing your filters.</p>
-          </div>
+  {filteredServices.length === 0 && (
+    <div className="empty-state">
+      <h3>No services found</h3>
+      <p>Try changing your filters.</p>
+    </div>
+  )}
+
+  {filteredServices.slice(0, 9).map((service) => (
+    <article className="modern-service-card" key={service.id}>
+      <div className="card-icon">🏪</div>
+
+      <div className="card-main">
+        <div className="card-title-row">
+          <h3>{service.service_name}</h3>
+          <span className="category-pill">{service.category}</span>
+        </div>
+
+        <p className="business-name">{service.business_name}</p>
+
+        <p className="rating-line">
+          ⭐ {Number(service.average_rating || 0).toFixed(1)}{" "}
+          ({service.review_count || 0} reviews)
+        </p>
+
+        <p className="service-desc">
+          {service.description || "No description provided."}
+        </p>
+
+        <div className="card-info">
+          <span>📍 {service.address || "Address not provided"}</span>
+          <span>
+            🏛️ {service.zip_code} {service.state}, {service.country}
+          </span>
+          <span>📞 {service.phone || "Phone not provided"}</span>
+          <span>🕒 {service.opening_hours || "Hours not provided"}</span>
+        </div>
+
+        <div className="card-actions">
+          <button
+            className="details-btn"
+            onClick={() => handleViewDetails(service)}
+          >
+            View Details
+          </button>
+
+          {service.website && (
+            <a
+              href={service.website}
+              target="_blank"
+              rel="noreferrer"
+              className="website-link"
+            >
+              Visit Website ↗
+            </a>
+          )}
+        </div>
+      </div>
+    </article>
+  ))}
+</section>
+
+{selectedService && (
+  <div
+    className="modal-overlay"
+    onClick={() => setSelectedService(null)}
+  >
+    <div
+      className="service-detail-modal"
+      onClick={(e) => e.stopPropagation()}
+    >
+      <button
+        className="modal-close"
+        onClick={() => setSelectedService(null)}
+      >
+        ✕
+      </button>
+
+      <div className="detail-header">
+        <div className="modal-icon">🏪</div>
+
+        <div>
+          <h2>{selectedService.service_name}</h2>
+
+          <p className="business-name">
+            {selectedService.business_name}
+          </p>
+
+          <span className="category-pill">
+            {selectedService.category}
+          </span>
+        </div>
+      </div>
+
+      <div className="detail-section">
+        <h3>Description</h3>
+        <p>{selectedService.description}</p>
+      </div>
+
+      <div className="detail-grid">
+        <div>
+          <strong>📍 Address</strong>
+          <p>{selectedService.address}</p>
+        </div>
+
+        <div>
+          <strong>📞 Phone</strong>
+          <p>{selectedService.phone}</p>
+        </div>
+
+        <div>
+          <strong>🕒 Opening Hours</strong>
+          <p>{selectedService.opening_hours}</p>
+        </div>
+
+        <div>
+          <strong>🌐 Website</strong>
+          <p>{selectedService.website}</p>
+        </div>
+      </div>
+
+      <div className="review-section">
+        <h3>
+          Reviews ({reviews.length})
+        </h3>
+
+        {reviews.length === 0 && (
+          <p>No reviews yet.</p>
         )}
 
-        {filteredServices.map((service) => (
-          <article className="modern-service-card" key={service.id}>
-            <div className="card-icon">🏪</div>
+        {reviews.map((review) => (
+          <div
+            className="review-card"
+            key={review.id}
+          >
+            <strong>{review.reviewer_name}</strong>
 
-            <div className="card-main">
-              <div className="card-title-row">
-                <h3>{service.service_name}</h3>
-                <span className="category-pill">{service.category}</span>
-              </div>
+            <p>
+              {"⭐".repeat(review.rating)}
+            </p>
 
-              <p className="business-name">{service.business_name}</p>
-              <p className="service-desc">{service.description}</p>
+            <p>{review.comment}</p>
 
-              <div className="card-info">
-                <span>📍 {service.address}</span>
-                <span>
-                  🏛️ {service.zip_code} {service.state}, {service.country}
-                </span>
-                <span>📞 {service.phone}</span>
-              </div>
-
-              <div className="card-actions">
-                <button type="button" className="details-btn">
-                  View Details
-                </button>
-
-                {service.website && (
-                  <a
-                    href={service.website}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="website-link"
-                  >
-                    Visit Website ↗
-                  </a>
-                )}
-              </div>
-            </div>
-          </article>
+            <small>
+              {new Date(review.created_at).toLocaleDateString()}
+            </small>
+          </div>
         ))}
-      </section>
+      </div>
+
+      <div className="detail-actions">
+        <a
+          href="/signup"
+          className="save-btn"
+        >
+          Sign up to write a review
+        </a>
+
+        <button
+          className="close-btn"
+          onClick={() => setSelectedService(null)}
+        >
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
+
     </div>
   );
 }

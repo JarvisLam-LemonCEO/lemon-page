@@ -1751,3 +1751,37 @@ label {
   font-weight: 800;
   margin: 6px 0 10px;
 }
+
+/* intro view detail */
+.save-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  background: linear-gradient(135deg, #ffd43b, #f4b400);
+  color: #202124;
+  text-decoration: none;
+ 
+  padding: 12px 22px;
+  border: none;
+  border-radius: 12px;
+
+  font-weight: 700;
+  font-size: 15px;
+
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.save-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(244, 180, 0, 0.3);
+}
+
+.save-btn:visited {
+  color: #202124;
+}
+
+.save-btn:active {
+  transform: scale(0.98);
+}
