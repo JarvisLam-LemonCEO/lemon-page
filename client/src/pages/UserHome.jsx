@@ -13,6 +13,12 @@ import {
 } from "../api/activityApi";
 
 import {
+  getReviewsByService,
+  saveReview,
+  deleteReview,
+} from "../api/reviewApi";
+
+import {
   getFavorites,
   addFavorite,
   removeFavorite,
@@ -34,6 +40,12 @@ function UserHome() {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [sort, setSort] = useState("newest");
+
+  const [reviews, setReviews] = useState([]);
+const [reviewForm, setReviewForm] = useState({
+  rating: 5,
+  comment: "",
+});
 
   const [filters, setFilters] = useState({
     category: "",
@@ -97,16 +109,23 @@ function UserHome() {
   };
 
   const handleViewDetails = async (service) => {
-    setSelectedService(service);
+  setSelectedService(service);
 
-    try {
-      await addRecentlyViewed(service.id);
-      const viewed = await getRecentlyViewed();
-      setRecentlyViewed(viewed);
-    } catch (error) {
-      console.log("Failed to save recently viewed", error);
-    }
-  };
+  try {
+    await addRecentlyViewed(service.id);
+    const viewed = await getRecentlyViewed();
+    setRecentlyViewed(viewed);
+  } catch (error) {
+    console.log("Failed to save recently viewed", error);
+  }
+
+  try {
+    const reviewData = await getReviewsByService(service.id);
+    setReviews(reviewData);
+  } catch (error) {
+    console.log("Failed to load reviews", error);
+  }
+};
 
   const handleSaveSearch = async () => {
     try {
@@ -153,6 +172,29 @@ function UserHome() {
         service.country?.toLowerCase().includes(filters.country.toLowerCase()))
     );
   });
+
+  const handleSubmitReview = async (e) => {
+  e.preventDefault();
+
+  try {
+    await saveReview(selectedService.id, reviewForm);
+    const reviewData = await getReviewsByService(selectedService.id);
+    setReviews(reviewData);
+    setReviewForm({ rating: 5, comment: "" });
+  } catch (error) {
+    console.log("Failed to save review", error);
+  }
+};
+
+const handleDeleteReview = async () => {
+  try {
+    await deleteReview(selectedService.id);
+    const reviewData = await getReviewsByService(selectedService.id);
+    setReviews(reviewData);
+  } catch (error) {
+    console.log("Failed to delete review", error);
+  }
+};
 
   return (
     <>
@@ -495,6 +537,60 @@ function UserHome() {
                 <div>
                   <strong>🌐 Website</strong>
                   <p>{selectedService.website || "Not provided"}</p>
+                </div>
+              </div>
+
+              <div className="review-section">
+                <h3>Reviews</h3>
+
+                <form onSubmit={handleSubmitReview} className="review-form">
+                  <select
+                    value={reviewForm.rating}
+                    onChange={(e) =>
+                      setReviewForm({ ...reviewForm, rating: Number(e.target.value) })
+                    }
+                  >
+                    <option value={5}>⭐⭐⭐⭐⭐ 5</option>
+                    <option value={4}>⭐⭐⭐⭐ 4</option>
+                    <option value={3}>⭐⭐⭐ 3</option>
+                    <option value={2}>⭐⭐ 2</option>
+                    <option value={1}>⭐ 1</option>
+                  </select>
+
+                  <textarea
+                    placeholder="Write your review..."
+                    value={reviewForm.comment}
+                    onChange={(e) =>
+                      setReviewForm({ ...reviewForm, comment: e.target.value })
+                    }
+                  />
+
+                  <div className="review-actions">
+                    <button type="submit" className="save-btn">
+                      Submit Review
+                    </button>
+
+                    <button
+                      type="button"
+                      className="danger-btn"
+                      onClick={handleDeleteReview}
+                    >
+                      Delete My Review
+                    </button>
+                  </div>
+                </form>
+
+                <div className="review-list">
+                  {reviews.length === 0 && <p>No reviews yet.</p>}
+
+                  {reviews.map((review) => (
+                    <div className="review-card" key={review.id}>
+                      <strong>{review.reviewer_name}</strong>
+                      <p>{"⭐".repeat(review.rating)}</p>
+                      <p>{review.comment}</p>
+                      <small>{new Date(review.created_at).toLocaleString()}</small>
+                    </div>
+                  ))}
                 </div>
               </div>
 

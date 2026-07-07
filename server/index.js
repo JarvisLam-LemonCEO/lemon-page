@@ -11,6 +11,7 @@ const favoriteRoutes = require("./routes/favoriteRoutes");
 const statsRoutes = require("./routes/statsRoutes");
 const adminRoutes = require("./routes/adminRoutes");
 const notificationRoutes = require("./routes/notificationRoutes");
+const reviewRoutes = require("./routes/reviewRoutes");
 
 const app = express();
 
@@ -29,6 +30,7 @@ app.use("/api/favorites", favoriteRoutes);
 app.use("/api/stats", statsRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/notifications", notificationRoutes);
+app.use("/api/reviews", reviewRoutes);
 
 const PORT = process.env.PORT || 5050;
 

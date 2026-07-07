@@ -59,35 +59,38 @@ exports.addRecentlyViewed = (req, res) => {
     `,
     [req.user.id, serviceId],
     (err) => {
-      if (err) return res.status(500).json({ message: "Failed to add recently viewed" });
+      if (err) {
+        return res.status(500).json({ message: "Failed to add recently viewed" });
+      }
+
+      db.run(
+        `UPDATE services SET view_count = view_count + 1 WHERE id = ?`,
+        [serviceId],
+        (err) => {
+          if (err) {
+            return res.status(500).json({ message: "Failed to update view count" });
+          }
+
+          db.get(
+            `SELECT user_id, service_name FROM services WHERE id = ?`,
+            [serviceId],
+            (err, service) => {
+              if (!err && service && service.user_id !== req.user.id) {
+                createNotification({
+                  userId: service.user_id,
+                  serviceId,
+                  type: "view",
+                  message: `Your listing "${service.service_name}" was viewed.`,
+                });
+              }
+
+              return res.json({ message: "Recently viewed saved" });
+            }
+          );
+        }
+      );
     }
   );
-
-  db.run(
-    `UPDATE services SET view_count = view_count + 1 WHERE id = ?`,
-    [serviceId],
-    (err) => {
-      if (err) return res.status(500).json({ message: "Failed to update view count" });
-      res.json({ message: "Recently viewed saved" });
-    }
-  );
-
-  db.get(
-  `SELECT user_id, service_name FROM services WHERE id = ?`,
-  [serviceId],
-  (err, service) => {
-    if (!err && service && service.user_id !== req.user.id) {
-      createNotification({
-        userId: service.user_id,
-        serviceId,
-        type: "view",
-        message: `Your listing "${service.service_name}" was viewed.`,
-      });
-    }
-
-    res.json({ message: "Recently viewed saved" });
-  }
-);
 };
 
 exports.getRecentlyViewed = (req, res) => {

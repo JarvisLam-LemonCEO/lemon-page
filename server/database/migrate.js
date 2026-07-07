@@ -60,3 +60,25 @@ db.serialize(() => {
 
   console.log("Migration complete");
 });
+
+db.run(`
+  CREATE TABLE IF NOT EXISTS reviews (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    service_id INTEGER NOT NULL,
+    rating INTEGER CHECK(rating BETWEEN 1 AND 5) NOT NULL,
+    comment TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(user_id, service_id)
+  )
+`);
+
+db.run(`
+  CREATE INDEX IF NOT EXISTS idx_reviews_service_id
+  ON reviews(service_id)
+`);
+
+db.run(`
+  CREATE INDEX IF NOT EXISTS idx_reviews_user_id
+  ON reviews(user_id)
+`);

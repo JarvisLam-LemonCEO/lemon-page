@@ -88,3 +88,18 @@ CREATE INDEX IF NOT EXISTS idx_services_created_at ON services(created_at);
 CREATE INDEX IF NOT EXISTS idx_services_view_count ON services(view_count);
 CREATE INDEX IF NOT EXISTS idx_services_category ON services(category);
 CREATE INDEX IF NOT EXISTS idx_notifications_user_id ON notifications(user_id);
+
+CREATE TABLE IF NOT EXISTS reviews (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id INTEGER NOT NULL,
+  service_id INTEGER NOT NULL,
+  rating INTEGER CHECK(rating BETWEEN 1 AND 5) NOT NULL,
+  comment TEXT,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE(user_id, service_id),
+  FOREIGN KEY (user_id) REFERENCES users(id),
+  FOREIGN KEY (service_id) REFERENCES services(id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_reviews_service_id ON reviews(service_id);
+CREATE INDEX IF NOT EXISTS idx_reviews_user_id ON reviews(user_id);
