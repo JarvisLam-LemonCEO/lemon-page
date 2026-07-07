@@ -178,8 +178,19 @@ const [reviewForm, setReviewForm] = useState({
 
   try {
     await saveReview(selectedService.id, reviewForm);
+
     const reviewData = await getReviewsByService(selectedService.id);
     setReviews(reviewData);
+
+    const serviceData = await getAllServices(page, 9, sort);
+
+    if (Array.isArray(serviceData)) {
+      setServices(serviceData);
+    } else {
+      setServices(serviceData.services || []);
+      setTotalPages(serviceData.totalPages || 1);
+    }
+
     setReviewForm({ rating: 5, comment: "" });
   } catch (error) {
     console.log("Failed to save review", error);
@@ -411,6 +422,11 @@ const handleDeleteReview = async () => {
                 </div>
 
                 <p className="business-name">{service.business_name}</p>
+                <p className="rating-line">
+  ⭐ {Number(service.average_rating || 0).toFixed(1)} 
+  {" "}
+  ({service.review_count || 0} reviews)
+</p>
                 <p className="service-desc">{service.description}</p>
 
                 <div className="card-info">

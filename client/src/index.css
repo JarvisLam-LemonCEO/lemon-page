@@ -1745,3 +1745,9 @@ label {
 .review-card small {
   color: #6b7280;
 }
+
+.rating-line {
+  color: #b7791f;
+  font-weight: 800;
+  margin: 6px 0 10px;
+}

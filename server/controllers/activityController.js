@@ -3,46 +3,73 @@ const createNotification = require("../utils/createNotification");
 
 exports.getNewListings = (req, res) => {
   const sql = `
-    SELECT services.*, users.name AS business_name
+    SELECT
+      services.*,
+      users.name AS business_name,
+      COALESCE(AVG(reviews.rating), 0) AS average_rating,
+      COUNT(reviews.id) AS review_count
     FROM services
     JOIN users ON services.user_id = users.id
+    LEFT JOIN reviews ON reviews.service_id = services.id
+    GROUP BY services.id
     ORDER BY services.created_at DESC
     LIMIT 12
   `;
 
   db.all(sql, [], (err, rows) => {
-    if (err) return res.status(500).json({ message: "Failed to get new listings" });
+    if (err) {
+      return res.status(500).json({ message: "Failed to get new listings" });
+    }
+
     res.json(rows);
   });
 };
 
 exports.getPopularServices = (req, res) => {
   const sql = `
-    SELECT services.*, users.name AS business_name
+    SELECT
+      services.*,
+      users.name AS business_name,
+      COALESCE(AVG(reviews.rating), 0) AS average_rating,
+      COUNT(reviews.id) AS review_count
     FROM services
     JOIN users ON services.user_id = users.id
+    LEFT JOIN reviews ON reviews.service_id = services.id
+    GROUP BY services.id
     ORDER BY services.view_count DESC, services.created_at DESC
     LIMIT 12
   `;
 
   db.all(sql, [], (err, rows) => {
-    if (err) return res.status(500).json({ message: "Failed to get popular services" });
+    if (err) {
+      return res.status(500).json({ message: "Failed to get popular services" });
+    }
+
     res.json(rows);
   });
 };
 
 exports.getFeaturedBusinesses = (req, res) => {
   const sql = `
-    SELECT services.*, users.name AS business_name
+    SELECT
+      services.*,
+      users.name AS business_name,
+      COALESCE(AVG(reviews.rating), 0) AS average_rating,
+      COUNT(reviews.id) AS review_count
     FROM services
     JOIN users ON services.user_id = users.id
+    LEFT JOIN reviews ON reviews.service_id = services.id
     WHERE services.is_featured = 1
+    GROUP BY services.id
     ORDER BY services.created_at DESC
     LIMIT 12
   `;
 
   db.all(sql, [], (err, rows) => {
-    if (err) return res.status(500).json({ message: "Failed to get featured businesses" });
+    if (err) {
+      return res.status(500).json({ message: "Failed to get featured businesses" });
+    }
+
     res.json(rows);
   });
 };
@@ -95,17 +122,27 @@ exports.addRecentlyViewed = (req, res) => {
 
 exports.getRecentlyViewed = (req, res) => {
   const sql = `
-    SELECT services.*, users.name AS business_name, recently_viewed.viewed_at
+    SELECT
+      services.*,
+      users.name AS business_name,
+      recently_viewed.viewed_at,
+      COALESCE(AVG(reviews.rating), 0) AS average_rating,
+      COUNT(reviews.id) AS review_count
     FROM recently_viewed
     JOIN services ON recently_viewed.service_id = services.id
     JOIN users ON services.user_id = users.id
+    LEFT JOIN reviews ON reviews.service_id = services.id
     WHERE recently_viewed.user_id = ?
+    GROUP BY services.id
     ORDER BY recently_viewed.viewed_at DESC
     LIMIT 12
   `;
 
   db.all(sql, [req.user.id], (err, rows) => {
-    if (err) return res.status(500).json({ message: "Failed to get recently viewed" });
+    if (err) {
+      return res.status(500).json({ message: "Failed to get recently viewed" });
+    }
+
     res.json(rows);
   });
 };
@@ -115,15 +152,34 @@ exports.addSearchHistory = (req, res) => {
 
   const sql = `
     INSERT INTO search_history (
-      user_id, search_text, category, zip_code, state, country
+      user_id,
+      search_text,
+      category,
+      zip_code,
+      state,
+      country
     )
     VALUES (?, ?, ?, ?, ?, ?)
   `;
 
-  db.run(sql, [req.user.id, search_text, category, zip_code, state, country], (err) => {
-    if (err) return res.status(500).json({ message: "Failed to save search history" });
-    res.json({ message: "Search history saved" });
-  });
+  db.run(
+    sql,
+    [
+      req.user.id,
+      search_text || "",
+      category || "",
+      zip_code || "",
+      state || "",
+      country || "",
+    ],
+    (err) => {
+      if (err) {
+        return res.status(500).json({ message: "Failed to save search history" });
+      }
+
+      res.json({ message: "Search history saved" });
+    }
+  );
 };
 
 exports.getSearchHistory = (req, res) => {
@@ -136,7 +192,10 @@ exports.getSearchHistory = (req, res) => {
   `;
 
   db.all(sql, [req.user.id], (err, rows) => {
-    if (err) return res.status(500).json({ message: "Failed to get search history" });
+    if (err) {
+      return res.status(500).json({ message: "Failed to get search history" });
+    }
+
     res.json(rows);
   });
 };

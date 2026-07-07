@@ -3,11 +3,17 @@ const createNotification = require("../utils/createNotification");
 
 exports.getFavorites = (req, res) => {
   const sql = `
-    SELECT services.*, users.name AS business_name
+    SELECT
+      services.*,
+      users.name AS business_name,
+      COALESCE(AVG(reviews.rating), 0) AS average_rating,
+      COUNT(reviews.id) AS review_count
     FROM favorites
     JOIN services ON favorites.service_id = services.id
     JOIN users ON services.user_id = users.id
+    LEFT JOIN reviews ON reviews.service_id = services.id
     WHERE favorites.user_id = ?
+    GROUP BY services.id
     ORDER BY favorites.created_at DESC
   `;
 
